@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Rocket, Battery, HardDrive, CloudLightning, 
   AlertTriangle, CheckCircle, Clock, Zap, Target, 
-  BrainCircuit, Radar, Database, Activity 
+  BrainCircuit, Radar, Database, Activity, Globe 
 } from 'lucide-react';
 
 export function Dashboard({ selectedSatellite, setSelectedSatellite }: any) {
@@ -17,6 +17,8 @@ export function Dashboard({ selectedSatellite, setSelectedSatellite }: any) {
   ]);
   const [disasterMode, setDisasterMode] = useState(false);
   const [chaosEvent, setChaosEvent] = useState<string | null>(null);
+
+  const isPlanner = selectedSatellite?.id ? selectedSatellite.id.toString().charCodeAt(0) % 2 === 0 : false;
 
   // Live simulation tick
   useEffect(() => {
@@ -95,7 +97,7 @@ export function Dashboard({ selectedSatellite, setSelectedSatellite }: any) {
         transition={{ type: 'spring', damping: 25, stiffness: 120 }}
         className="absolute right-4 md:right-8 top-8 bottom-8 w-full max-w-[420px] pointer-events-auto flex flex-col"
       >
-        <div className="flex-1 rounded-2xl overflow-hidden bg-space-900/60 backdrop-blur-2xl border border-neon-blue/20 shadow-[0_0_40px_rgba(0,100,255,0.15)] flex flex-col relative">
+        <div className={`flex-1 rounded-2xl overflow-hidden backdrop-blur-2xl border flex flex-col relative transition-colors duration-500 ${chaosEvent ? 'bg-red-900/40 border-red-500/50 shadow-[0_0_40px_rgba(255,0,0,0.3)] animate-none' : 'bg-space-900/60 border-neon-blue/20 shadow-[0_0_40px_rgba(0,100,255,0.15)]'}`}>
           
           {/* Header */}
           <div className="p-6 border-b border-white/5 relative bg-gradient-to-br from-white/5 to-transparent">
@@ -198,12 +200,17 @@ export function Dashboard({ selectedSatellite, setSelectedSatellite }: any) {
                 </div>
 
                 {/* Cognitive Role */}
-                <div className="bg-neon-blue/5 border border-neon-blue/20 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <BrainCircuit className="w-4 h-4 text-neon-blue" />
-                    <span className="text-xs tracking-widest text-neon-blue uppercase font-bold">Node Role</span>
+                <div className={`border rounded-xl p-4 ${isPlanner ? 'bg-purple-900/20 border-purple-500/30' : 'bg-neon-blue/5 border-neon-blue/20'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <BrainCircuit className={`w-4 h-4 ${isPlanner ? 'text-purple-400' : 'text-neon-blue'}`} />
+                    <span className={`text-[10px] tracking-widest uppercase font-bold ${isPlanner ? 'text-purple-400' : 'text-neon-blue'}`}>
+                      {isPlanner ? 'Planner Node' : 'Executor Node'}
+                    </span>
                   </div>
-                  <p className="text-sm text-white/80 font-mono">Payload Execution & Data Relay (Load: 42%)</p>
+                  <p className="text-xs text-white/80 font-mono">
+                    {isPlanner ? 'Coordinating fleet strategy & distributing tasks.' : 'Payload Execution & Direct Data Relay.'} 
+                    <br/><span className="text-[10px] opacity-50 mt-1 block">(System Load: {(tasks.length * 15 + 12)}%)</span>
+                  </p>
                 </div>
               </motion.div>
             )}
@@ -230,11 +237,18 @@ export function Dashboard({ selectedSatellite, setSelectedSatellite }: any) {
 
                 {/* Scheduler */}
                 <div>
-                  <h3 className="text-[10px] font-bold tracking-widest text-white/40 uppercase mb-3">Schedule Sub-Task</h3>
+                  <div className="flex justify-between items-end mb-3">
+                    <h3 className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Satellite Task Scheduling Env</h3>
+                    <div className="text-[8px] text-green-400 font-mono flex items-center gap-1 border border-green-400/20 px-1.5 py-0.5 rounded bg-green-400/10"><Target className="w-2 h-2"/> Reward: Maximize Data</div>
+                  </div>
                   <div className="grid grid-cols-3 gap-2">
-                    <button onClick={() => scheduleTask('Low')} className="py-2 bg-white/5 rounded border border-white/10 text-[10px] font-bold text-white/70 hover:bg-white/10">ROUTINE</button>
-                    <button onClick={() => scheduleTask('Medium')} className="py-2 bg-white/5 rounded border border-white/10 text-[10px] font-bold text-yellow-500 hover:bg-yellow-500/10">HIGH RES</button>
-                    <button onClick={() => scheduleTask('Critical')} className="py-2 bg-white/5 rounded border border-white/10 text-[10px] font-bold text-red-400 hover:bg-red-500/10">URGENT</button>
+                    <button onClick={() => scheduleTask('Low')} className="py-2 bg-white/5 rounded border border-white/10 text-[10px] font-bold text-white/70 hover:bg-white/10 flex flex-col items-center gap-1"><span className="text-blue-300"><CloudLightning className="w-3 h-3"/></span>ROUTINE</button>
+                    <button onClick={() => scheduleTask('Medium')} className="py-2 bg-white/5 rounded border border-white/10 text-[10px] font-bold text-yellow-500 hover:bg-yellow-500/10 flex flex-col items-center gap-1"><span><Radar className="w-3 h-3"/></span>HIGH RES</button>
+                    <button onClick={() => scheduleTask('Critical')} className="py-2 bg-white/5 rounded border border-white/10 text-[10px] font-bold text-red-400 hover:bg-red-500/10 flex flex-col items-center gap-1"><span><AlertTriangle className="w-3 h-3"/></span>URGENT</button>
+                  </div>
+                  <div className="mt-2 flex justify-between text-[8px] font-mono text-white/40 uppercase">
+                     <span>Priority: Dynamic</span>
+                     <span>Target: Weather & Surface</span>
                   </div>
                   {battery < 15 && <p className="text-xs text-red-400 mt-2 font-mono flex items-center gap-1"><AlertTriangle className="w-3 h-3"/> Warning: Insufficient power for Routine tasks.</p>}
                 </div>
@@ -267,7 +281,7 @@ export function Dashboard({ selectedSatellite, setSelectedSatellite }: any) {
                  
                  {/* Constraint Engine */}
                  <div>
-                   <h3 className="text-[10px] font-bold tracking-widest text-white/40 uppercase mb-3">Constraint Decision Engine</h3>
+                   <h3 className="text-[10px] font-bold tracking-widest text-white/40 uppercase mb-3">Cognitive Load Balancing</h3>
                    <div className="p-4 bg-black/40 border border-white/5 rounded-xl font-mono text-xs space-y-2 text-white/70">
                      <p className="flex justify-between"><span>Power Threshold:</span> <span className={battery > 30 ? 'text-green-400' : 'text-red-400'}>{battery > 30 ? 'OK' : 'CRITICAL'}</span></p>
                      <p className="flex justify-between"><span>Storage Matrix:</span> <span className={storage < 90 ? 'text-green-400' : 'text-red-400'}>{storage < 90 ? 'OK' : 'FILLING'}</span></p>
@@ -279,19 +293,38 @@ export function Dashboard({ selectedSatellite, setSelectedSatellite }: any) {
                    </div>
                  </div>
 
+                 {/* Global Attention */}
+                 <div>
+                   <h3 className="text-[10px] font-bold tracking-widest text-neon-blue uppercase mb-3 flex items-center gap-2"><Globe className="w-3 h-3"/> Global Attention Map</h3>
+                   <div className={`bg-white/5 border rounded-xl p-4 flex items-center justify-center relative overflow-hidden h-24 transition-colors duration-500 ${disasterMode ? 'border-red-500/50' : 'border-white/5'}`}>
+                     <div className={`absolute inset-0 mix-blend-screen transition-colors duration-500 ${disasterMode ? 'bg-red-900/30' : 'bg-blue-900/10'}`} />
+                     <motion.div 
+                       animate={{ opacity: [0.3, 0.8, 0.3], scale: [1, 1.2, 1] }} 
+                       transition={{ duration: disasterMode ? 1.5 : 4, repeat: Infinity }}
+                       className={`absolute w-12 h-12 rounded-full blur-xl ${disasterMode ? 'bg-red-500/60' : 'bg-neon-blue/40'}`}
+                     />
+                     <span className={`relative z-10 text-[10px] font-mono font-bold tracking-widest text-center whitespace-pre-line ${disasterMode ? 'text-red-400' : 'text-white'}`}>
+                       {disasterMode ? "DISASTER ZONE DETECTED:\nAUTOMATICALLY SHIFTING FOCUS" : "ANALYZING HIGH-PRIORITY SECTORS"}
+                     </span>
+                   </div>
+                 </div>
+
                  {/* Satellite Dreams Simulation */}
                  <div>
-                   <h3 className="text-[10px] font-bold tracking-widest text-white/40 uppercase mb-3">Neural Forecast Scenarios</h3>
-                   <div className="space-y-2">
-                     <ScenarioCard title="Max Data Capture" desc="Maximize sensor usage. Highly efficient but heavy battery drain." isBest={calculateScenario() === 'A'} />
-                     <ScenarioCard title="Conservational Safety" desc="Prioritize battery health and safe bandwidth." isBest={calculateScenario() === 'B'} />
-                     <ScenarioCard title="Balanced Output" desc="AI optimized harmony of power and data gathering." isBest={calculateScenario() === 'C'} />
+                   <div className="flex items-center justify-between mb-3">
+                     <h3 className="text-[10px] font-bold tracking-widest text-neon-blue uppercase">Satellite Dreams Engine</h3>
+                     <span className="text-[8px] bg-neon-blue/20 text-neon-blue px-1.5 py-0.5 rounded animate-pulse font-mono flex items-center gap-1 border border-neon-blue/30"><Activity className="w-2 h-2"/> SIMULATING</span>
+                   </div>
+                   <div className="grid grid-cols-3 gap-2">
+                     <ScenarioCard title="Path A: Max Data" desc="High drain" isBest={calculateScenario() === 'A'} isDisaster={disasterMode} />
+                     <ScenarioCard title="Path B: Safe Mode" desc="Conserve energy" isBest={calculateScenario() === 'B'} isDisaster={disasterMode} />
+                     <ScenarioCard title="Path C: Optimal" desc="AI balanced rx" isBest={calculateScenario() === 'C'} isDisaster={disasterMode} />
                    </div>
                  </div>
 
                  {/* Chaos Controls */}
                  <div className="pt-4 border-t border-white/10">
-                   <h3 className="text-[10px] font-bold tracking-widest text-red-500/80 uppercase mb-3">Stress Test / Chaos Control</h3>
+                   <h3 className="text-[10px] font-bold tracking-widest text-red-500/80 uppercase mb-3">Chaos Testing Mode</h3>
                    <div className="grid grid-cols-2 gap-2">
                      <button onClick={() => setChaosEvent('solar_storm')} className="p-2 border border-red-500/30 rounded text-[10px] font-bold text-red-400 hover:bg-red-500/10 uppercase">Induce Solar Flare</button>
                      <button onClick={() => setChaosEvent('sensor_fail')} className="p-2 border border-red-500/30 rounded text-[10px] font-bold text-red-400 hover:bg-red-500/10 uppercase">Blind Sensors</button>
@@ -370,12 +403,28 @@ function Sparkles({ className }: any) {
   return <Zap className={className} />; // Fallback icon
 }
 
-function ScenarioCard({ title, desc, isBest }: any) {
+function ScenarioCard({ title, desc, isBest, isDisaster }: any) {
+  let bgClass = 'bg-white/5 border-white/5';
+  let badgeClass = '';
+  let shadowClass = '';
+  
+  if (isBest) {
+    if (isDisaster) {
+      bgClass = 'bg-red-500/10 border-red-500/50';
+      badgeClass = 'bg-red-500 text-white';
+      shadowClass = 'shadow-[0_0_10px_rgba(255,0,0,0.3)]';
+    } else {
+      bgClass = 'bg-neon-blue/10 border-neon-blue/50';
+      badgeClass = 'bg-neon-blue text-black';
+      shadowClass = 'shadow-[0_0_10px_rgba(0,240,255,0.3)]';
+    }
+  }
+
   return (
-    <div className={`p-3 rounded-lg border transition-colors relative overflow-hidden ${isBest ? 'bg-neon-blue/10 border-neon-blue/50' : 'bg-white/5 border-white/5'}`}>
-      {isBest && <div className="absolute top-0 right-0 px-2 py-0.5 bg-neon-blue text-black text-[8px] font-black uppercase tracking-widest">Recommended</div>}
-      <h4 className={`text-xs font-bold ${isBest ? 'text-white' : 'text-white/70'}`}>{title}</h4>
-      <p className="text-[10px] text-white/40 mt-1">{desc}</p>
+    <div className={`p-2 rounded-lg border transition-all relative overflow-hidden h-full flex flex-col justify-start ${bgClass} ${shadowClass}`}>
+      {isBest && <div className={`absolute top-0 inset-x-0 py-0.5 text-[7px] text-center font-black uppercase tracking-widest ${badgeClass}`}>Best Path</div>}
+      <h4 className={`text-[9px] font-bold mt-2 pt-1 ${isBest ? 'text-white' : 'text-white/70'}`}>{title}</h4>
+      <p className="text-[8px] text-white/50 mt-1 leading-tight">{desc}</p>
     </div>
   );
 }

@@ -72,7 +72,7 @@ function CloudLayer({ cloudsMap }: { cloudsMap: THREE.Texture }) {
   );
 }
 
-export function Earth() {
+export function Earth(props: any) {
   const earthRef = useRef<THREE.Mesh>(null);
 
   const [colorMap, cloudsMap, nightMap] = useLoader(TextureLoader, [
@@ -97,7 +97,15 @@ export function Earth() {
   return (
     <group>
       {/* Main Earth Shader */}
-      <mesh ref={earthRef}>
+      <mesh ref={earthRef} onClick={(e) => {
+        e.stopPropagation();
+        if (typeof (props as any).onClick === 'function') {
+           (props as any).onClick();
+        }
+      }}
+      onPointerOver={() => document.body.style.cursor = 'pointer'}
+      onPointerOut={() => document.body.style.cursor = 'auto'}
+      >
         <sphereGeometry args={[2, 64, 64]} />
         <shaderMaterial
           vertexShader={earthVertexShader}

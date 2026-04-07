@@ -3,7 +3,7 @@ import { Dashboard } from './Dashboard';
 import { motion } from 'framer-motion';
 import { Rocket } from 'lucide-react';
 
-export function Interface({ selectedSatellite, setSelectedSatellite }: any) {
+export function Interface({ selectedSatellite, setSelectedSatellite, onShowGlobal }: any) {
   return (
     <div className="absolute inset-0 z-10 pointer-events-none flex flex-col">
       {/* Header */}
@@ -37,7 +37,12 @@ export function Interface({ selectedSatellite, setSelectedSatellite }: any) {
         >
           <span className="hover:text-neon-blue hover:shadow-[0_0_15px_rgba(0,240,255,0.8)] cursor-pointer pointer-events-auto transition-all">MISSIONS</span>
           <span className="hover:text-neon-blue hover:shadow-[0_0_15px_rgba(0,240,255,0.8)] cursor-pointer pointer-events-auto transition-all">DATABASE</span>
-          <span className="hover:text-neon-blue hover:shadow-[0_0_15px_rgba(0,240,255,0.8)] cursor-pointer pointer-events-auto transition-all">SYSTEMS</span>
+          <span 
+            onClick={onShowGlobal}
+            className="hover:text-neon-blue hover:shadow-[0_0_15px_rgba(0,240,255,0.8)] cursor-pointer pointer-events-auto transition-all"
+          >
+            SYSTEMS
+          </span>
         </motion.div>
       </header>
 

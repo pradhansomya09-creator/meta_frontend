@@ -38,7 +38,7 @@ function CinematicCamera({ selectedSatellite, cameraControlsRef }: any) {
   return null;
 }
 
-export function Scene({ selectedSatellite, setSelectedSatellite }: any) {
+export function Scene({ selectedSatellite, setSelectedSatellite, onShowGlobal }: any) {
   const cameraControlsRef = useRef<any>(null);
 
   return (
@@ -60,7 +60,7 @@ export function Scene({ selectedSatellite, setSelectedSatellite }: any) {
           <Sparkles count={400} scale={25} size={3.0} speed={0.05} opacity={0.2} color="#cc00ff" />
           
           <CosmicEnvironment />
-          <Earth />
+          <Earth onClick={onShowGlobal} />
           
           <Satellites 
             selectedSatellite={selectedSatellite} 
